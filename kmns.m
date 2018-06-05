@@ -46,6 +46,18 @@ if ~isempty(answer)
 %         newC(i,:) = (C(sameCentroids(i,1),:)+C(sameCentroids(i,2),:))./2;
 %         C(sameCentroids(i,1),:) = (C(sameCentroids(i,1),:)+C(sameCentroids(i,2),:))./2;
         C(sameCentroids(i,2),:) = C(sameCentroids(i,1),:);
+        [row3,col3] = find(KMNS_color_index == sameCentroids(i,2));
+        oldCentrs = cat(2,row3,col3);
+        for j = 1:size(oldCentrs,1)
+            KMNS_color_index(oldCentrs(j,1),oldCentrs(j,2)) = sameCentroids(i,1);
+        end
+        % Change following code (lines 63,64,65) by finding duplicates in
+        % matrix C and delete them
+        % Another solution is the following one, to fill these centroids with
+        % zeros
+        if ~ismember(sameCentroids(i,2),sameCentroids(:,1))
+            C(sameCentroids(i,2),:) = 0;
+        end
         [row2,col2] = find(sameCentroids == sameCentroids(i,2));
         smCnt = cat(2,row2,col2);
         if ~isempty(smCnt)
@@ -53,18 +65,16 @@ if ~isempty(answer)
                 sameCentroids(smCnt(w,1),smCnt(w,2)) = sameCentroids(i,1);
             end
         end
-        [row3,col3] = find(KMNS_color_index == sameCentroids(i,2));
-        oldCentrs = cat(2,row3,col3);
-        for j = 1:size(oldCentrs,1)
-            KMNS_color_index(oldCentrs(j,1),oldCentrs(j,2)) = sameCentroids(j,1);
-        end
     end
-    % Change following code (lines 63,64,65) by finding duplicates in matrix C and deleting them %
-    for i=1:size(sameCentroids,1)
-        if ~ismember(sameCentroids(i,2),sameCentroids(:,1))
-            C(sameCentroids(i,2),:) = 0;
-        end
-    end
+%     % Change following code (lines 63,64,65) by finding duplicates in
+%     % matrix C and delete them
+%     % Another solution is the following one, to fill these centroids with
+%     % zeros
+%     for i=1:size(sameCentroids,1)
+%         if ~ismember(sameCentroids(i,2),sameCentroids(:,1))
+%             C(sameCentroids(i,2),:) = 0;
+%         end
+%     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     row_has_all_zeros = ~any(C, 2);
     indices = find(row_has_all_zeros);
