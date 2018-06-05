@@ -59,11 +59,13 @@ if ~isempty(answer)
             KMNS_color_index(oldCentrs(j,1),oldCentrs(j,2)) = sameCentroids(j,1);
         end
     end
+    % Change following code (lines 63,64,65) by finding duplicates in matrix C and deleting them %
     for i=1:size(sameCentroids,1)
         if ~ismember(sameCentroids(i,2),sameCentroids(:,1))
             C(sameCentroids(i,2),:) = 0;
         end
     end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     row_has_all_zeros = ~any(C, 2);
     indices = find(row_has_all_zeros);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
