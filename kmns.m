@@ -26,7 +26,7 @@ if ~isempty(answer)
     KMNS_color_index = reshape(KMNS_color_index,size_temp(1),size_temp(2));
     KMNS_min = zeros(size_temp(1),size_temp(2)); 
     Distance = D;
-    %%%%%% centroid comparing %%%%%%
+    %%%%%% centroid comparing for number of clusters determination %%%%%%
     s = size(C(:,1));
     angleSAM = zeros(s(1),s(1));
     for j=1:s
@@ -37,15 +37,17 @@ if ~isempty(answer)
         end
     end
     angleSAM = round(angleSAM, 6, 'decimals');
-    threshold = 0.03;
+    threshold = 0.03; %% replace with 0.001 for AWN
+    % check for similar centroids
     angleSAM2 = triu(angleSAM);
     [row1,col1] = find(angleSAM2 < threshold & angleSAM2 > 0);
     sameCentroids = cat(2,row1,col1);
-    %newC = size(C);
-    for i=1:size(sameCentroids,1)
+%     newC = size(C);
+    for i=1:size(sameCentroids,1) % for the similar centroids do the following
 %         newC(i,:) = (C(sameCentroids(i,1),:)+C(sameCentroids(i,2),:))./2;
 %         C(sameCentroids(i,1),:) = (C(sameCentroids(i,1),:)+C(sameCentroids(i,2),:))./2;
         C(sameCentroids(i,2),:) = C(sameCentroids(i,1),:);
+        % change cluster number for these pixels in pseudocolor matrix
         [row3,col3] = find(KMNS_color_index == sameCentroids(i,2));
         oldCentrs = cat(2,row3,col3);
         for j = 1:size(oldCentrs,1)
@@ -66,16 +68,7 @@ if ~isempty(answer)
             end
         end
     end
-%     % Change following code (lines 63,64,65) by finding duplicates in
-%     % matrix C and delete them
-%     % Another solution is the following one, to fill these centroids with
-%     % zeros
-%     for i=1:size(sameCentroids,1)
-%         if ~ismember(sameCentroids(i,2),sameCentroids(:,1))
-%             C(sameCentroids(i,2),:) = 0;
-%         end
-%     end
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % to find the final number of clusters
     row_has_all_zeros = ~any(C, 2);
     indices = find(row_has_all_zeros);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
