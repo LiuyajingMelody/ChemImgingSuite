@@ -201,13 +201,11 @@ for i=1:handles.num_clusters
         end
     end
 end
-save('color_map')
-save('colors')
 allaxes = findall(handles.figure1,'type','axes');   
 imshow(color_map./255,'Parent',allaxes(2));
 cl_opt=load([PathName '\RESULTS\' 'KMNSopt.mat' ]);
 cl_opt=cl_opt.answer;
-strSave=[PathName '\RESULTS\' FileName '_KMNS_' int2str(strdate) '-' cl_opt{:}];
+strSave=[PathName '\RESULTS\' FileName '_KMNS_' int2str(strdate) '-' cl_opt{:}]; 
 imwrite(color_map./255,[strSave '.png'],'png');
 
 % --------------------------------------------------------------------
@@ -215,7 +213,46 @@ function k_medoids_Callback(hObject, eventdata, handles)
 % hObject    handle to k_medoids (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+strdate = str2num(datestr(now,'ddmmyyHHMMSS'))
+handles.strdate=strdate;
+guidata(hObject, handles);
+PathName=handles.file_name_3;
+FileWavelength=handles.FileWavelength;
+if  ~isempty(PathName)
+    FileName=handles.file_name_2;
+    FileName=['reg_' FileName];
+    temp=getappdata(handles.figure1,'image_cube');
+        if ~isempty(handles.choose_WL)
+            [X Y] = compare2Arrays(handles.choose_WL,FileWavelength);
+            temp=temp(:,:,Y);
+            FileWavelength=FileWavelength(Y);
+        end
+        [num_clusters color_index] = kmeds(temp,PathName,FileName,strdate);
+        handles.num_clusters=num_clusters;
+        guidata(hObject, handles);
+        FileName=FileName(1:end-4);
+end
 
+if  ~isempty(handles.num_clusters)
+    for i=1:handles.num_clusters
+        colors(i,:)=random('unid',255,[1,3]);
+    end
+    setappdata(handles.figure1,'colorMap',colors);
+end
+color_map = zeros(size(color_index,1),size(color_index,2),3);
+for i=1:handles.num_clusters
+    for k=1:size(color_index,1)
+        for l=1:size(color_index,2)
+            if color_index(k,l) == i
+                color_map(k, l, :) = colors(i, :);
+            end
+        end
+    end
+end
+allaxes = findall(handles.figure1,'type','axes');   
+imshow(color_map./255,'Parent',allaxes(2));
+strSave=[PathName '\RESULTS\' FileName '_KMEDS_' int2str(strdate)];
+imwrite(color_map./255,[strSave '.png'],'png');
 
 % --------------------------------------------------------------------
 function isodata_Callback(hObject, eventdata, handles)
