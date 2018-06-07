@@ -19,6 +19,7 @@ else
 end
 answer = inputdlg(prompt,dlg_title,num_lines,def);
 if ~isempty(answer)
+    tic
     save([PathName '\RESULTS\KMNSopt'],'answer');
     opts = statset('Display','final','UseParallel','never');
     [KMNS_color_index C sumd D]=kmeans(temp,str2num(answer{1}),'distance',answer{2}, 'emptyaction',answer{3},...
@@ -72,11 +73,12 @@ if ~isempty(answer)
     row_has_all_zeros = ~any(C, 2);
     indices = find(row_has_all_zeros);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    num_clusters = str2num(answer{1}); %% replace with size(C,1)-size(indices,1)
+    num_clusters = size(C,1)-size(indices,1); %str2num(answer{1}); 
     
     save([PathName '\RESULTS\' FileName '_KMNS_min_' int2str(FileWavelength) ], 'KMNS_min');
     save([PathName '\RESULTS\' FileName '_KMNS_color_index_' int2str(FileWavelength)], 'KMNS_color_index');
 end
+toc
 
 
 
